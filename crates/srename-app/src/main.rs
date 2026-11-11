@@ -1,6 +1,9 @@
 //! SmartRename desktop app (egui). macOS first, Windows later — the rename
 //! engine lives in srename-core and is shared.
 
+// On Windows, run as a GUI app: no console window behind the UI.
+#![cfg_attr(target_os = "windows", windows_subsystem = "windows")]
+
 use std::path::PathBuf;
 
 use eframe::egui;
@@ -2330,7 +2333,7 @@ impl eframe::App for SmartRenameApp {
                 .id(egui::Id::new("about_window"))
                 .anchor(egui::Align2::CENTER_CENTER, egui::Vec2::ZERO)
                 .title_bar(false)
-                .fixed_size(egui::Vec2::new(440.0, 380.0))
+                .fixed_size(egui::Vec2::new(480.0, 500.0))
                 .collapsible(false)
                 .resizable(false)
                 .open(&mut open)
@@ -2386,8 +2389,9 @@ impl eframe::App for SmartRenameApp {
                         egui::Layout::top_down(egui::Align::Center)
                             .with_main_align(egui::Align::Center),
                         |ui| {
+                            ui.add_space(10.0);
                             about_icon(ui);
-                            ui.add_space(14.0);
+                            ui.add_space(20.0);
                             ui.label(egui::RichText::new("SmartReName").size(22.0));
                             ui.add_space(6.0);
                             ui.label(
@@ -2411,13 +2415,14 @@ impl eframe::App for SmartRenameApp {
                                 .size(12.5)
                                 .weak(),
                             );
-                            ui.add_space(16.0);
+                            ui.add_space(24.0);
                             ui.label(egui::RichText::new("By Mr.Ben").size(16.0));
                             ui.add_space(2.0);
                             ui.hyperlink_to(
                                 egui::RichText::new("https://mrben.net").size(16.0),
                                 "https://mrben.net",
                             );
+                            ui.add_space(10.0);
                         },
                     );
                 });

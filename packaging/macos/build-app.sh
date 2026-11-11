@@ -16,7 +16,36 @@ echo "== assembling ${APP} =="
 rm -rf "${APP}"
 mkdir -p "${APP}/Contents/MacOS" "${APP}/Contents/Resources"
 cp "target/release/${BIN_NAME}" "${APP}/Contents/MacOS/${BIN_NAME}"
-cp "packaging/macos/AppIcon.icns" "${APP}/Contents/Resources/AppIcon.icns"
+# App icon: prefer the Icon Composer asset (same approach as PureMap).
+# actool compiles packaging/macos/Icon.icon into Assets.car + Icon.icns,
+# which current macOS renders natively (proper squircle, no fallback
+# plate). Without actool/Xcode, fall back to the classic .icns under
+# the same name so the build always ships an icon.
+ICON_SRC="packaging/macos/Icon.icon"
+ACTOOL=""
+if command -v xcrun >/dev/null 2>&1; then
+    ACTOOL="$(xcrun --find actool 2>/dev/null || true)"
+fi
+if [ -n "${ACTOOL}" ] && [ -d "${ICON_SRC}" ]; then
+    if "${ACTOOL}" "${ICON_SRC}" \
+        --compile "${APP}/Contents/Resources" \
+        --app-icon Icon \
+        --enable-on-demand-resources NO \
+        --development-region en \
+        --target-device mac \
+        --minimum-deployment-target 26.0 \
+        --platform macosx \
+        --output-partial-info-plist "${TMPDIR:-/tmp}/smartrename-icon-partial.plist" \
+        > "icon-build.log" 2>&1; then
+        echo "== icon: Icon Composer (actool) =="
+    else
+        echo "== icon: actool failed, falling back to classic icns (see icon-build.log) =="
+        rm -f "${APP}/Contents/Resources/Assets.car"
+        cp "packaging/macos/AppIcon.icns" "${APP}/Contents/Resources/Icon.icns"
+    fi
+else
+    cp "packaging/macos/AppIcon.icns" "${APP}/Contents/Resources/Icon.icns"
+fi
 
 # Single source of truth for the version: the app crate's Cargo.toml.
 VERSION="$(grep -m1 '^version = ' crates/srename-app/Cargo.toml | sed 's/.*"\(.*\)".*/\1/')"
@@ -36,7 +65,9 @@ cat > "${APP}/Contents/Info.plist" <<'PLIST'
     <key>CFBundleDisplayName</key>
     <string>SmartReName</string>
     <key>CFBundleIconFile</key>
-    <string>AppIcon</string>
+    <string>Icon</string>
+    <key>CFBundleIconName</key>
+    <string>Icon</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
@@ -57,5 +88,10 @@ sed -i '' "s/__VERSION__/${VERSION}/" "${APP}/Contents/Info.plist" 2>/dev/null \
 
 # Ad-hoc signature so Gatekeeper lets it run locally (same approach as PureMap).
 codesign --force --deep --sign - "${APP}" || echo "(codesign skipped)"
+
+LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
+if [ -x "${LSREGISTER}" ]; then
+    "${LSREGISTER}" -f "${APP}" || true
+fi
 
 echo "== done: ${APP} =="
