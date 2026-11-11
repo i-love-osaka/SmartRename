@@ -1,0 +1,21 @@
+[package]
+name = "srename-app"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+description = "SmartRename (Rust) desktop app — batch file renaming, macOS first, Windows later"
+
+[[bin]]
+name = "SmartRename"
+path = "src/main.rs"
+
+[dependencies]
+srename-core = { path = "../srename-core" }
+eframe = { version = "0.31", default-features = false, features = ["glow", "x11", "wayland", "persistence"] }
+serde = { version = "1", features = ["derive"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+muda = "0.17"
+
+[target.'cfg(any(target_os = "macos", target_os = "windows"))'.dependencies]
+rfd = "0.15"

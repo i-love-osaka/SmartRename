@@ -1,0 +1,23 @@
+[package]
+name = "srename-core"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+description = "Cross-platform batch rename engine (clean-room reimplementation of SmartRename / 拖把更名器 core behavior)"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+regex = "1"
+filetime = "0.2"
+pinyin = "0.10"
+zhconv = "0.3"
+
+kamadak-exif = "0.6"
+time = { version = "0.3", features = ["local-offset"] }
+
+[dev-dependencies]
+time = { version = "0.3", features = ["local-offset"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+libc = "0.2"
