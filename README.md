@@ -1,46 +1,51 @@
 # SmartReName
 
-A pure, fast, undoable batch file renamer — a clean-room reimplementation
-of the classic 2004 Chinese freeware **拖把更名器 (SmartRename)**, rebuilt
-from scratch in Rust. No original code; only its feature set, rethought.
+A pure, fast, undoable batch file renamer. A clean-room reimplementation of
+the classic 2004 Chinese freeware 拖把更名器 (SmartRename), rebuilt from
+scratch in Rust. No original code; only its feature set, rethought.
 
-The original was a great tool that stopped being maintained years ago —
-it even opens with an error dialog you have to dismiss. This version keeps
-what made it useful, drops what time has made pointless, and starts with
-**zero dialogs, zero errors**.
+The original was a great tool that stopped being maintained years ago. It
+even opens with an error dialog you have to dismiss first. This version
+keeps what made it useful, drops what time has made pointless, and starts
+with zero dialogs, zero errors.
 
 ## Features
 
-- **Live preview** — every setting updates the preview as you type;
-  conflicts and errors are flagged before anything touches disk
-- **Six groups of operations**
-  - *Overall* — case conversion, capitalize words, change extension,
-    naming styles (camelCase / PascalCase / snake_case / kebab-case),
-    one-click cleanup of download noise (`(1)`, `- 副本`, `[site.com]`,
-    full-width characters), Traditional ⇄ Simplified Chinese
-  - *Replace* — plain or **regular expressions** with teaching examples;
-    a built-in library of 15 practical patterns lives under
-    *Help → Regex Examples*, each with copy buttons
-  - *Numbering* — sequence numbers with templates like `ep-<#>`
-  - *Add* — prefix, suffix, insert at position
-  - *Delete* — by range or by substring
-  - *More* — 9 preset script commands (Chinese → pinyin, initials,
-    reverse, alternating case, …), rename from parent folder,
-    rename by date (EXIF / modified / created), set file times
-- **Operation records** — stack operations into a pipeline, save / load
-  them as JSON, replay the last run, and **undo** any executed rename
-- **Safety** — two-phase execution (via temporary names), conflict
-  detection with optional auto-numbering `(2)`, `(3)`, optional
-  timestamp preservation, per-file failure reasons stay visible
-- **Everyday polish** — drag & drop, multi-select file picker,
-  name filter for long lists, sortable columns, keyboard shortcuts
-  (⌘O, ⌘Z, ⇧⌘Z, Delete), settings remembered across launches,
-  follows system light/dark theme, native macOS menu bar
+- Live preview: every setting updates the preview as you type, and
+  conflicts are flagged before anything touches disk
+- Six groups of operations
+  - Overall: case conversion, capitalize words, change extension, naming
+    styles (camelCase / PascalCase / snake_case / kebab-case), one-click
+    cleanup of download noise (`(1)`, `- 副本`, `[site.com]`, full-width
+    characters), Traditional ⇄ Simplified Chinese
+  - Replace: plain text or regular expressions, with teaching examples.
+    A built-in library of 15 practical patterns lives under
+    Help → Regex Examples, each with copy buttons
+  - Numbering: sequence numbers with templates like `ep-<#>`
+  - Add: prefix, suffix, insert at position
+  - Delete: by range or by substring
+  - More: 9 preset script commands (Chinese → pinyin, initials, reverse,
+    alternating case, …), rename from the parent folder, rename by date
+    (EXIF / modified / created), set file times
+- Operation records: stack operations into a pipeline, save and load them
+  as JSON, replay the last run, and undo any executed rename
+- Safety: two-phase execution through temporary names, conflict detection
+  with optional auto-numbering `(2)`, `(3)`, per-file failure reasons stay
+  visible after a run
+- Everyday bits: drag & drop, multi-select file picker, a name filter for
+  long lists, sortable columns, keyboard shortcuts (⌘O, ⌘Z, ⇧⌘Z, Delete),
+  settings remembered across launches, follows the system light/dark
+  theme, native macOS menu bar
 - Hidden files are always skipped
 
-Deliberately **not** included (things time made pointless): ID3 / RMVB
+Deliberately not included, because time made them pointless: ID3 / RMVB
 tag editing, Explorer/Finder context menus, meta-variables, free-form
 scripting, and the legacy `.xto` record format.
+
+## Download
+
+Prebuilt builds are on the
+[Releases](https://github.com/i-love-osaka/SmartRename/releases) page.
 
 ## Build & run
 
@@ -83,7 +88,7 @@ pull request.
 
 ## Status
 
-- **macOS first** (Apple Silicon), Windows planned — the engine is
+- macOS first (Apple Silicon); a Windows build exists and the engine is
   cross-platform
 - The interface is currently Chinese; English localization is welcome
 

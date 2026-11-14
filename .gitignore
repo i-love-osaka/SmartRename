@@ -1,7 +1,9 @@
 /target
 **/target
 .DS_Store
-# Local crates-mirror config and build leftovers are not part of the repo.
+*.app/
+*.dmg
+*.log
+dist/
+# Local crates-mirror config is not part of the repo.
 /.cargo/
-build.log
-/*.app/

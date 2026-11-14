@@ -250,12 +250,11 @@ fn std_btn(ui: &mut egui::Ui, text: &str) -> bool {
     text_button(ui, size, text, false)
 }
 
-/// The "应用：…" button at the bottom of each settings section: one fixed
-/// size for every tab so the panel looks uniform.
-/// The apply button at the bottom of a form section: fixed size,
-/// just says 应用 (the section title carries the meaning), and grey
-/// while the section has nothing armed — so it can never queue a
-/// no-op operation into the record.
+/// The apply button at the bottom of each settings section: one fixed
+/// size for every tab so the panel looks uniform. It just says 应用
+/// (the section title carries the meaning) and stays grey while the
+/// section has nothing armed — so it can never queue a no-op
+/// operation into the record.
 fn add_op_button(ui: &mut egui::Ui, enabled: bool) -> bool {
     text_button_enabled(ui, egui::vec2(150.0, 32.0), "应用", false, enabled)
 }
@@ -263,9 +262,9 @@ fn add_op_button(ui: &mut egui::Ui, enabled: bool) -> bool {
 /// Downward shift (points) for the label of the custom drawn controls
 /// (check/radio rows, text buttons). CJK fonts carry a very tall line
 /// box (large hhea line gap), so egui's stock widgets center the line
-/// box while the glyph ink itself rides several points too high —
-/// measured against the user's screenshots. The custom controls draw
-/// the label with this correction so ink and control share one center.
+/// box while the glyph ink itself rides several points too high.
+/// The custom controls draw the label with this correction so ink
+/// and control share one center.
 const LABEL_INK_NUDGE: f32 = 3.2;
 
 fn label_galley(ui: &egui::Ui, text: &str) -> std::sync::Arc<egui::Galley> {
@@ -386,7 +385,7 @@ fn radio_row<T: PartialEq>(
 }
 
 /// A number field that is ALWAYS a text box. (egui::DragValue only
-/// turns into an editor after a click, which the user disliked.) The
+/// turns into an editor after a click.) The
 /// edit buffer lives in egui temp memory: while focused it may hold
 /// not-yet-parseable text ("-", ""); the value only changes on a
 /// successful parse, and the buffer resyncs when focus leaves.
@@ -622,7 +621,7 @@ fn about_icon(ui: &mut egui::Ui) {
 
 /// Small remove (×) button drawn into a given rect. The × is painted,
 /// not a font glyph: "✕" is missing from the loaded font chain and
-/// showed up as "?" on the user's Mac.
+/// would render as "?".
 fn remove_btn_at(ui: &mut egui::Ui, rect: egui::Rect, id: egui::Id) -> bool {
     let response = ui.interact(rect, id, egui::Sense::click());
     let visuals = ui.style().interact(&response);
@@ -666,7 +665,7 @@ fn section(ui: &mut egui::Ui, title: &str, body: impl FnOnce(&mut egui::Ui)) {
 }
 
 /// Toolbar icons, hand-drawn with the painter as 1.8px line art — the same
-/// design language as the user's PureMap (58x62 icon buttons, icon above,
+/// design language as PureMap (58x62 icon buttons, icon above,
 /// 11px label below, groups split by hairline separators).
 #[derive(Clone, Copy)]
 enum Icon {
@@ -3003,6 +3002,12 @@ type NativeMenuHandle = NativeMenu;
 #[allow(dead_code)]
 struct NativeMenuHandle;
 
+/// Open a URL in the user's default browser (Help menu links).
+#[cfg(target_os = "macos")]
+fn open_url(url: &str) {
+    let _ = std::process::Command::new("open").arg(url).spawn();
+}
+
 #[cfg(target_os = "macos")]
 struct NativeMenu {
     _menu: muda::Menu,
@@ -3021,6 +3026,8 @@ struct NativeMenu {
     theme_dark: muda::CheckMenuItem,
     about: muda::MenuItem,
     regex_help: muda::MenuItem,
+    homepage: muda::MenuItem,
+    github: muda::MenuItem,
     last_undo: bool,
     last_replay: bool,
     last_clear: bool,
@@ -3039,8 +3046,6 @@ fn build_native_menu() -> Option<NativeMenu> {
     // Custom item (not the predefined about panel) so it opens the
     // app's own beautified About window.
     let about = MenuItem::new("关于 SmartReName", true, None);
-    app_menu.append(&about).ok()?;
-    app_menu.append(&PredefinedMenuItem::separator()).ok()?;
     app_menu.append(&PredefinedMenuItem::quit(None)).ok()?;
     menu.append(&app_menu).ok()?;
 
@@ -3101,10 +3106,17 @@ fn build_native_menu() -> Option<NativeMenu> {
     view_menu.append(&theme_dark).ok()?;
     menu.append(&view_menu).ok()?;
 
-    // 帮助
+    // 帮助 (About lives here, together with the homepage and
+    // GitHub links).
     let help_menu = Submenu::new("帮助", true);
     let regex_help = MenuItem::new("正则表达式示例", true, None);
+    let homepage = MenuItem::new("作者主页", true, None);
+    let github = MenuItem::new("在GitHub上查看", true, None);
     help_menu.append(&regex_help).ok()?;
+    help_menu.append(&PredefinedMenuItem::separator()).ok()?;
+    help_menu.append(&about).ok()?;
+    help_menu.append(&homepage).ok()?;
+    help_menu.append(&github).ok()?;
     menu.append(&help_menu).ok()?;
 
     menu.init_for_nsapp();
@@ -3126,6 +3138,8 @@ fn build_native_menu() -> Option<NativeMenu> {
         theme_dark,
         about,
         regex_help,
+        homepage,
+        github,
         last_undo: false,
         last_replay: false,
         last_clear: false,
@@ -3188,6 +3202,10 @@ impl SmartRenameApp {
                 self.show_about = true;
             } else if id == m.regex_help.id() {
                 self.show_regex_help = true;
+            } else if id == m.homepage.id() {
+                open_url("https://mrben.net");
+            } else if id == m.github.id() {
+                open_url("https://github.com/i-love-osaka/SmartRename");
             }
         }
         // Sync enabled / checked states when they change.

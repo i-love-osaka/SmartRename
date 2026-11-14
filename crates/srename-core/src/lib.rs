@@ -40,8 +40,7 @@ pub fn split_name(file_name: &str) -> NameParts {
 }
 
 /// Replace characters that are unsafe in file names on Windows/macOS/Linux
-/// with '_', trim trailing dots/spaces, and cap the length. Used for names
-/// derived from file contents (HTML title, first line, text file lines).
+/// with '_', trim trailing dots/spaces, and cap the length.
 pub fn sanitize_name(raw: &str) -> String {
     let mut s: String = raw
         .chars()
